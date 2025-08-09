@@ -1,0 +1,46 @@
+name: release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Your release tag'
+        required: true
+  release:
+    types:
+      - released
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: pip requirements
+        run: pip install -r requirements.txt
+      - name: pack plugin
+        run: mcdreforged pack
+      - name: get tag
+        id: get_tag
+        run: |
+          if [ '${{ github.event_name }}' == 'release' ]; then
+            echo 'tag=${{ github.event.release.tag_name }}' >> $GITHUB_OUTPUT
+          else
+            echo 'tag=${{ github.event.inputs.tag }}' >> $GITHUB_OUTPUT
+          fi
+      - name: check tag
+        uses: cardinalby/git-get-release-action@v1
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+        with:
+          tag: '${{ steps.get_tag.outputs.tag }}'
+      - name: publish
+        uses: softprops/action-gh-release@v2
+        with:
+          files: '*.mcdr'
+          tag_name: '${{ steps.get_tag.outputs.tag }}'
