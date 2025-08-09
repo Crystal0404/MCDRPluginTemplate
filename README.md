@@ -13,4 +13,6 @@ Read the doc for more information on writing a plugin: https://docs.mcdreforged.
 
 Added GitHub Action, which will automatically package and upload the plugin when you release a new version.
 
+You can also upload by manually specifying a release tag.
+
 That's it. This fork remains under the CC0 license. Have fun!
