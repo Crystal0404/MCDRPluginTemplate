@@ -7,7 +7,7 @@ on:
         required: true
   release:
     types:
-      - released
+      - published
 
 jobs:
   release:
@@ -15,16 +15,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v4
-      - name: setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - name: pip requirements
-        run: pip install -r requirements.txt
-      - name: pack plugin
-        run: mcdreforged pack
       - name: get tag
         id: get_tag
         run: |
@@ -39,6 +29,16 @@ jobs:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         with:
           tag: '${{ steps.get_tag.outputs.tag }}'
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: pip requirements
+        run: pip install -r requirements.txt
+      - name: pack plugin
+        run: mcdreforged pack
       - name: publish
         uses: softprops/action-gh-release@v2
         with:
